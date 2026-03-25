@@ -1,0 +1,34 @@
+exclude: 'alembic/|devops/|scripts/'
+default_stages: [ pre-commit ]
+fail_fast: true
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        description: 'Удаляет пробелы в конце строк'
+      - id: end-of-file-fixer
+        description: 'Добавляет пустую строку в конец файла'
+      - id: check-yaml
+        description: 'Проверяет синтаксис YAML файлов'
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.7
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        description: 'Проверяет типизацию'
+        args: [ --config-file=src/backend/pyproject.toml ]
+        additional_dependencies: [
+          "types-cachetools",
+          "pydantic",
+          "fastapi"
+        ]

@@ -1,0 +1,27 @@
+FROM python:3.13-slim-bookworm
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/opt/project/app
+
+WORKDIR /opt/project/app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV TZ=Europe/Moscow
+
+COPY src/backend/pyproject.toml src/backend/uv.lock ./
+
+RUN uv sync --frozen --no-dev --no-install-project
+
+COPY src/backend .
+COPY devops/scripts ./scripts
+RUN chmod +x scripts/*.sh
+
+EXPOSE 5000
+
+CMD ["./scripts/run_backend.sh"]
